@@ -16,12 +16,16 @@
 package com.example.androiddevchallenge
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
@@ -36,12 +40,21 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+var timeInMilliseconds = 30000L
+
 // Start building your app here!
 @Composable
 fun MyApp() {
+    val timeState = remember { mutableStateOf(timeInMilliseconds) }
+
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+        SetTimer(timeState)
     }
+    launchCountdownTimer(
+        updateTime = { newTime ->
+            timeState.value = newTime
+        }
+    )
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
@@ -58,4 +71,24 @@ fun DarkPreview() {
     MyTheme(darkTheme = true) {
         MyApp()
     }
+}
+
+fun launchCountdownTimer(updateTime: (Long) -> Unit) {
+    object : CountDownTimer(timeInMilliseconds, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            println("seconds remaining: " + millisUntilFinished / 1000)
+            updateTime(millisUntilFinished)
+        }
+
+        override fun onFinish() {
+            println("done!")
+        }
+    }.start()
+}
+
+@Composable
+private fun SetTimer(timeInMilliseconds: MutableState<Long>) {
+    val minutes = (timeInMilliseconds.value / 1000) / 60
+    val seconds = (timeInMilliseconds.value / 1000) % 60
+    Text(text = "$minutes : $seconds")
 }
