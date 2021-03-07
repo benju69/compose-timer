@@ -25,7 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
@@ -40,22 +40,20 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-var timeInMilliseconds = 30000L
+var countDownTime = 30000L
 
-//TODO a way to enter time: field, +- buttons, keypad
-//TODO animations: a circle
+// TODO a way to enter time: field, +- buttons, keypad
+// TODO animations: a circle
 @Composable
 fun MyApp() {
-    val timeState = remember { mutableStateOf(timeInMilliseconds) }
+    val timeState = rememberSaveable { mutableStateOf(countDownTime) }
 
     Surface(color = MaterialTheme.colors.background) {
         SetTimer(timeState)
     }
-    launchCountdownTimer(
-        updateTime = { newTime ->
-            timeState.value = newTime
-        }
-    )
+    launchCountdownTimer(timeState) { newTime ->
+        timeState.value = newTime
+    }
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
@@ -74,8 +72,8 @@ fun DarkPreview() {
     }
 }
 
-fun launchCountdownTimer(updateTime: (Long) -> Unit) {
-    object : CountDownTimer(timeInMilliseconds, 1000) {
+fun launchCountdownTimer(countDownTime: MutableState<Long>, updateTime: (Long) -> Unit) {
+    object : CountDownTimer(countDownTime.value, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             println("seconds remaining: " + millisUntilFinished / 1000)
             updateTime(millisUntilFinished)
