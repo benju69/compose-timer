@@ -42,7 +42,8 @@ class MainActivity : AppCompatActivity() {
 
 var timeInMilliseconds = 30000L
 
-// Start building your app here!
+//TODO a way to enter time: field, +- buttons, keypad
+//TODO animations: a circle
 @Composable
 fun MyApp() {
     val timeState = remember { mutableStateOf(timeInMilliseconds) }
